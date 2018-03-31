@@ -1,7 +1,5 @@
 package ochacker.inventoryalgorithms.inventory;
 
-import java.util.logging.Level;
-
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -15,7 +13,6 @@ public class InventoryHandler implements Listener {
 
 	@EventHandler
 	public void cancelInventoryClick(InventoryClickEvent event) {
-		InventoryAlgorithms.getInstance().getLogger().log(Level.INFO, "Inventory Handler fired");
 		if (!(event.getWhoClicked() instanceof Player)) {					// check if the entity who fired the command is an instance of the Player interface
 			return;															// terminate the event handling if it isn't a player
 		}
@@ -27,21 +24,21 @@ public class InventoryHandler implements Listener {
 			return;
 
 		String inventoryName = event.getClickedInventory().getName();
-		InventoryAlgorithms.getInstance().getLogger().log(Level.INFO, inventoryName);
 
 		if (!inventoryName.equalsIgnoreCase("Insertion Sort Visualization")) {
 			return;
 		}
-		
-		InventoryAlgorithms.getInstance().getLogger().log(Level.INFO, "Passed name check");
 
 		Player p = (Player) event.getWhoClicked();
 
 		// The following if statement will check to see if the item is a button. We only want to continue if it is a button 
 		// The isSimilar() function checks if an itemstack's item is the same as another's... it disregards stack SIZE 
 		
-		if (clickedItem.getType().equals(Material.STONE_BUTTON) || clickedItem.getType().equals(Material.WOOD_BUTTON)) {
-			InventoryAlgorithms.getInstance().getLogger().log(Level.INFO, "called sort");
+		if (clickedItem.getType().equals(Material.STONE_BUTTON)) {
+			InventoryAlgorithms.getInventoryOf(p).progressSort();
+		}
+		
+		if (clickedItem.getType().equals(Material.WOOD_BUTTON)) {
 			InventoryAlgorithms.getInventoryOf(p).instantSort();
 		}
 		

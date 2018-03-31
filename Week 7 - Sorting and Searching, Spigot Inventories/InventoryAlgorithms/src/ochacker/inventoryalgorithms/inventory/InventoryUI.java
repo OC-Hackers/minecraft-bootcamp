@@ -1,13 +1,14 @@
 package ochacker.inventoryalgorithms.inventory;
 
-import java.util.logging.Level;
-
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
 
 import ochacker.inventoryalgorithms.InventoryAlgorithms;
@@ -19,8 +20,9 @@ public class InventoryUI {
 	public final Inventory ui;
 
 	// Sorting variables
-	/* private int key = 0;
-	private int i, j = 0; */
+	private ItemStack key;
+	private int i = 0;
+	private int j = 1;
 
 	/**
 	 * Default constructor. 
@@ -81,8 +83,6 @@ public class InventoryUI {
 	 * Instantly sort the Inventory incrementally in amount
 	 */
 	public void instantSort() {
-		InventoryAlgorithms.getInstance().getLogger().log(Level.INFO, "start!");
-		
 		for (int j = 1; j < ui.getSize() - 3; j++) {
 			ItemStack key = ui.getItem(j);
 
@@ -102,13 +102,34 @@ public class InventoryUI {
 	 * @return - true if the sort progressed, false if otherwise
 	 */
 	public boolean progressSort() {
+		while (this.j < ui.getSize() - 3) {
+			this.key = ui.getItem(j);
+			
+			this.i = j - 1;
+			new BukkitRunnable() {
+				public void run() {
+					if (!(i >= 0 && ui.getItem(i).getAmount() > key.getAmount())) {
+						cancel();
+						return;
+					}
+					ui.setItem(i + 1, ui.getItem(i));
+					player.updateInventory();
+				}
+			}.runTaskLater(InventoryAlgorithms.getInstance(), 100L);
+			ui.setItem(i + 1, key);
+			player.updateInventory();
+			j++;
+		}
+		
 		BukkitScheduler scheduler = InventoryAlgorithms.getInstance().getServer().getScheduler();
 		scheduler.scheduleSyncRepeatingTask((Plugin) this, new Runnable() {
 			@Override
 			public void run() {
-
+				
 			}
 		}, 0L, 40L);
+		
+		
 		return false;
 	}
 
@@ -145,7 +166,18 @@ public class InventoryUI {
 			ui.setItem(i, new ItemStack(Material.GOLDEN_APPLE, stacksizes[i]));
 		}
 		
-		ui.setItem(size - 1, new ItemStack(Material.WOOD_BUTTON));
+		ItemStack woodButton = new ItemStack(Material.WOOD_BUTTON);
+		ItemMeta woodMeta = woodButton.getItemMeta();
+		woodMeta.setDisplayName(ChatColor.RED + "Fully Sort");
+		woodButton.setItemMeta(woodMeta);
+		
+		ItemStack stoneButton = new ItemStack(Material.STONE_BUTTON);
+		ItemMeta stoneMeta = stoneButton.getItemMeta();
+		stoneMeta.setDisplayName(ChatColor.GREEN + "Incrementally (Slowly) Sort Next Step");
+		stoneButton.setItemMeta(stoneMeta);
+		
+		ui.setItem(size - 1, woodButton);
+		ui.setItem(size - 2, stoneButton);
 	}
 
 	/**
