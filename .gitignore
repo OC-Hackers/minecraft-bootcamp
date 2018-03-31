@@ -4,6 +4,10 @@
 
 .vscode/
 .idea/
+.classpath
+# .project              # uncomment this to include Eclipse IDE project files
+bin/
+.settings/
 
 ######################
 ######## JAVA ########

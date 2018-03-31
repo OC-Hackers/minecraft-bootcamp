@@ -1,0 +1,5 @@
+name: InventoryAlgorithms
+description: Algorithmic visualization in Minecraft
+authors: [OC Hacker]
+version: 0.1
+main: ochacker.inventoryalgorithms.InventoryAlgorithms
